@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 from CBIR import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^CBIR_1/',views.sayHello),
-    url(r'^CBIR_2/',views.showInformation),
+    url(r'^CBIR_1/', views.sayHello),
+    url(r'^CBIR_2/$', views.showInformation),
+    # url(r'^site_media/(?P<path>.*)', 'django.views.static.serve', {'document_root': '/home/st/ImageNet/ILSVRC2012/ILSVRC2012/ILSVRC2012_img_train/n01440764/n01440764_18.JPEG'}),
+
 ]

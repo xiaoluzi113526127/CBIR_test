@@ -6,7 +6,7 @@ from keras import backend as K
 import csv
 import sys
 csv.field_size_limit(sys.maxsize)
-import os,django
+import os, django
 os.environ['DJANGO_SETTINGS_MODULE'] = 'CBIR_test.settings'
 django.setup()
 from CBIR.models import CBIRS_64_Feature

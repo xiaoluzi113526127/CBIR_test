@@ -11,11 +11,11 @@ class CBIRS_IMAGE(models.Model):
         return self.class_name
 
 class CBIRS_1024_Feature(models.Model):
-    id = models.IntegerField(max_length=20, primary_key=True)
+    id = models.CharField(max_length=20, primary_key=True)
     value = models.TextField(max_length=5000, default='a')
 
 
 class CBIRS_64_Feature(models.Model):
-     id = models.IntegerField(max_length=20, primary_key=True)
+     id = models.CharField(max_length=20, primary_key=True)
      value = models.CharField(max_length=200, default='a')
-     tag = models.CharField(max_length=20,default='a')
+     tag = models.CharField(max_length=20, default='a', db_index=True)

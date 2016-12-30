@@ -82,10 +82,10 @@ model.add(Activation('softmax'))
 model.compile(loss='categorical_crossentropy',
               optimizer='SGD',
               metrics=['accuracy'])
-checkpointer =ModelCheckpoint(filepath='model_1024to64_weights.h5', verbose=1, save_best_only=True)
+checkpointer =ModelCheckpoint(filepath='../model_1024to64_weights.h5', verbose=1, save_best_only=True)
 history = LossHistory()
 model.fit_generator(generate_batch_data_random_train(80),samples_per_epoch=train_data_len-1,validation_data=generate_batch_data_random_val(50),nb_val_samples=test_data_len-1,nb_epoch=10,verbose=1,callbacks=[checkpointer,history])
 model_json = model.to_json()  #等价于 json_string = model.get_config()
-with open("model_1024to64.json", "w") as json_file:
+with open("../model_1024to64.json", "w") as json_file:
     json_file.write(model_json)
 # model.save_weights('model_1024to64_weights.h5')#保存模型和权重

@@ -24,7 +24,7 @@ for d in os.listdir(dir):
                 get_id = images.id
                 label = count
                 # print get_id,images.local,label
-                get_1024 = test_caffe.test_caffe(images.local) #1024维的数据
+                get_1024, _ = test_caffe.test_caffe(images.local) #1024维的数据
                 ###保存1024维数据到数据库####
                 feature_1024 = CBIRS_1024_Feature()
                 feature_1024.id = get_id

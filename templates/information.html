@@ -1,15 +1,71 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CBIR DEMO演示系统</title>
+
+<link rel="stylesheet" type="text/css" href="../static/css/style.css" media="screen" />
+
+<script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../static/js/jquery.banner.revolution.min.js"></script>
+<script type="text/javascript" src="../static/js/banner.js"></script>
+<script>
+	function getFileUrl(sourceId) {
+		var url;
+		if (navigator.userAgent.indexOf("MSIE")>=1) { // IE
+			url = document.getElementById(sourceId).value;
+		}
+		else if(navigator.userAgent.indexOf("Firefox")>0) { // Firefox
+			url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+		}
+		else if(navigator.userAgent.indexOf("Chrome")>0) { // Chrome
+			url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+		}
+		return url;
+	}
+
+	/**
+	* 将本地图片 显示到浏览器上
+	*/
+	function preImg(sourceId, targetId) {
+		var url = getFileUrl(sourceId);
+		var imgPre = document.getElementById(targetId);
+		imgPre.src = url;
+	}
+    function I(id,targetId) {
+        document.getElementById(targetId).style.display = "";
+        document.getElementById(targetId).src = id;
+	}
+
+
+</script>
 </head>
+
 <body>
-    <ul>
-        {% for student in students %}
-        <li>
-            id:{{ student.id }},姓名：{{ student.name }},age: {{ student.age }}
-        </li>
-        {% endfor %}
-    </ul>
+
+<div id="wrapper">
+	<div class="chuangkou">
+		<div>
+			<h1 style="font-size:36px">CBIR DEMO</h1>
+		</div>
+	</div>
+
+	<div id="image">
+
+		<form method="post"  enctype="multipart/form-data" name="upload_form">
+            <input type="file" name="file" onchange="showImage()" />
+            <input type="submit" value="提交" name="upload"/>
+
+		</form>
+        <div id="imgPrev"></div>
+        <h2>该图片最有可能是一下五种类别之一<p>"{{image_name}}"</p></h2>
+        <h2>相似图片：</h2>
+        <div><img src="{{image1}}"></div>
+        <div><img src="{{image2}}"></div>
+        <div><img src="{{image3}}"></div>
+        <div><img src="{{image4}}"></div>
+        <div><img src="{{image5}}"></div>
+	</div>
+</div>
 </body>
 </html>

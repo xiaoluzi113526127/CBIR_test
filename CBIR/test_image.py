@@ -1,7 +1,8 @@
 #coding=utf-8
 #加载必要的库
-def find_id_by_64_hamming_dis(file_64, data_64, m):
+def find_id_by_64_hamming_dis(data_64, m):
     import os, django
+    import test_solr
     os.environ['DJANGO_SETTINGS_MODULE'] = 'CBIR_test.settings'
     django.setup()
     from CBIR.models import CBIRS_64_Feature
@@ -9,37 +10,52 @@ def find_id_by_64_hamming_dis(file_64, data_64, m):
     dic = {}
     # print data_64,type(data_64)
     tag_64 = [data_64[0][0:5]]   #得到索引前5个字符
-    ######加载数据库索引，利用索引过滤部分数据######
-    featur_64_object = CBIRS_64_Feature.objects.filter(tag=tag_64)
+    # print tag_64
+    ######利用solr数据库索引，利用索引过滤部分数据######
+    featur_64_object = test_solr.solr_find(tag_64)
+
+    ###########直接利用数据库索引###########
+    # featur_64_object = CBIRS_64_Feature.objects.filter(tag=tag_64)
+
     # print type(featur_64_object), featur_64_object
     for obj in featur_64_object:
-        ######计算汉明距离##########
-        dic[obj.id] = Levenshtein.hamming(data_64[0], eval(obj.value)[0])
+        # print obj[u'id'], type(obj[u'value'][1]), obj[u'value'][1]
+        ######solr计算汉明距离##########
+        dic[obj[u'id']] = Levenshtein.hamming(data_64[0], eval(obj[u'value'][1])[0])
+        ######利用数据库计算汉明距离##########
+        # dic[obj.id] = Levenshtein.hamming(data_64[0], eval(obj.value)[0])
     list = sorted(dic.items(), key=lambda item: item[1])
     # print dic
     # print list[0:m]
     return list[0:m]
 
-
 #####输入图片######
 def test_cbir(image_path,m,n):
-    import os,django
+    import os, django
     os.environ["GLOG_minloglevel"] = "2"  #表示不输出日志信息
     import test_caffe
     import test_1024tohanming64
     os.environ['DJANGO_SETTINGS_MODULE'] = 'CBIR_test.settings'
     django.setup()
-    from CBIR.models import CBIRS_IMAGE,CBIRS_1024_Feature,CBIRS_64_Feature
+    from CBIR.models import CBIRS_IMAGE, CBIRS_1024_Feature,CBIRS_64_Feature
     from PIL import Image
     import numpy as np
-    feature_1024 = test_caffe.test_caffe(image_path)  #[#,#,#,#,#,...]
+    # img = Image.open(image_path)
+    # img.show()
+    # print type(image_path),image_path,'test_cbir'
+    ######list_image_name表示图片最有可能所属的类别######
+    feature_1024, list_image_name = test_caffe.test_caffe(image_path)  #[#,#,#,#,#,...]
+    # print feature_1024
     list_1024 = []
     list_1024.append(feature_1024)
-    list_1024 = np.array(list_1024)
+    # print list_1024
+    list_1024 = np.asarray(list_1024)
+    # print list_1024
+    # print type(list_1024[0][500]), list_1024[0][500]
     feature_64 = test_1024tohanming64.Feature_1024toFeature_64(list_1024)  #字符形[1010010101110111...]
-
+    # print feature_64
     ######从数据库表64_feature中找到最近的64维的数据的ID，这里用到solr进行索引#######
-    list_id_64 = find_id_by_64_hamming_dis('ssss', feature_64, m)
+    list_id_64 = find_id_by_64_hamming_dis(feature_64, m)
 
     ######从数据库表1024_feature中找到最近的1024维的数据的ID#######
     dic = {}
@@ -49,12 +65,19 @@ def test_cbir(image_path,m,n):
         dic[i[0]] = distance
     list = sorted(dic.items(), key=lambda item: item[1])
     ######从数据库表image中找到最近的n个该ID的绝对路径并显示#######
+    list_img_path = []
     for i in list[0:n]:
         image = CBIRS_IMAGE.objects.get(id=i[0])
-        img = Image.open(image.local)
-        img.show()
+        image_path_absolute = image.local
+        image_path_relative = image_path_absolute.split('/')[8]
+        # print image_path
+        list_img_path.append(image_path_relative)
+        img = Image.open(image_path_absolute)
+        img.save('static/images/'+image_path_relative)
+        # img.show()
+    return list_img_path, list_image_name
 
-test_cbir('/home/st/桌面/1.jpg', 50, 8)
+# test_cbir('/home/st/PycharmProjects/CBIR_test/image/1.jpg', 50, 5)
 
 
 
